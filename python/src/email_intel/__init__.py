@@ -40,9 +40,25 @@ def infer_provider(mx_records):
         return "Google Workspace", 98
     if "mail.protection.outlook.com" in mx_str:
         return "Microsoft 365", 98
+    if "pphosted.com" in mx_str:
+        return "Proofpoint", 95
+    if "mimecast.com" in mx_str:
+        return "Mimecast", 95
+    if "barracudanetworks.com" in mx_str:
+        return "Barracuda", 95
+    if "iphmx.com" in mx_str:
+        return "Cisco IronPort", 95
+    if "amazonses.com" in mx_str:
+        return "Amazon SES", 95
+    if "mx.cloudflare.net" in mx_str:
+        return "Cloudflare", 95
+    if "mailgun.org" in mx_str:
+        return "Mailgun", 95
+    if "sendgrid.net" in mx_str:
+        return "Sendgrid", 95
     if "secureserver.net" in mx_str:
         return "GoDaddy", 95
-    if "zoho.com" in mx_str:
+    if "zoho.com" in mx_str or "zoho.in" in mx_str:
         return "Zoho Mail", 95
     if "protonmail.ch" in mx_str or "protonmail.com" in mx_str:
         return "Proton Mail", 95
@@ -51,6 +67,26 @@ def infer_provider(mx_records):
     if "fastmail.com" in mx_str:
         return "Fastmail", 95
     return "Unknown", 0
+
+def determine_domain_type(domain, is_public, is_disposable):
+    if is_disposable: return "Disposable"
+    if is_public: return "Public Webmail"
+
+    if re.search(r'\.(edu|ac)(\.[a-z]{2})?$', domain, re.I):
+        if domain.endswith('.in'): return "Indian Education"
+        if domain.endswith('.uk'): return "UK Education"
+        return "Education"
+
+    if re.search(r'\.(gov|mil)(\.[a-z]{2})?$', domain, re.I):
+        if domain.endswith('.in'): return "Indian Government"
+        if domain.endswith('.uk'): return "UK Government"
+        if domain.endswith('.gov') or domain.endswith('.mil'): return "US Government"
+        return "Government"
+
+    if re.search(r'\.org(\.[a-z]{2})?$', domain, re.I):
+        return "Organization"
+
+    return "Business"
 
 def resolve_mx(domain):
     try:
@@ -83,8 +119,9 @@ def analyze(email: str) -> dict:
     dmarc_records = resolve_txt(f"_dmarc.{domain}")
     
     dkim_probes = []
-    dkim_probes.extend(resolve_txt(f"google._domainkey.{domain}"))
-    dkim_probes.extend(resolve_txt(f"default._domainkey.{domain}"))
+    selectors = ['google', 'default', 's1', 's2', 'm1', 'm2', 'k1', 'k2', 'selector1', 'mail', 'dkim']
+    for selector in selectors:
+        dkim_probes.extend(resolve_txt(f"{selector}._domainkey.{domain}"))
 
     mx = len(mx_records) > 0
     spf = any("v=spf1" in txt for txt in txt_records)
@@ -92,17 +129,19 @@ def analyze(email: str) -> dict:
     dkim = len(dkim_probes) > 0
 
     provider, provider_conf = infer_provider(mx_records)
+    domain_type = determine_domain_type(domain, is_public, is_disposable)
     
     if is_public and provider == "Unknown":
         provider = "Public Webmail"
 
     score = 0
-    if mx: score += 30
-    if spf: score += 20
-    if dkim: score += 15
-    if dmarc: score += 15
-    if not is_disposable: score += 10
-    score += 10
+    if mx:
+        score += 30
+        if spf: score += 20
+        if dmarc: score += 15
+        if not is_disposable: score += 10
+        score += 10
+        score += 15 
 
     risk = "high"
     if score >= 80 and not is_disposable:
@@ -125,7 +164,7 @@ def analyze(email: str) -> dict:
         "dmarc": dmarc,
         "disposable": is_disposable,
         "publicProvider": is_public,
-        "businessEmail": not is_public and not is_disposable,
+        "type": domain_type,
         "catchAll": False,
         "risk": risk,
         "confidence": score

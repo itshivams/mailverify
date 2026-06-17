@@ -32,8 +32,12 @@ def main():
     intel_table.add_row("Valid:", "[green]Yes[/green]" if result["valid"] else "[red]No[/red]")
     intel_table.add_row("Provider:", f'{result["provider"]} [dim](Confidence: {result["providerConfidence"]}%)[/dim]')
     
-    email_type = "[blue]Business[/blue]" if result["businessEmail"] else "[yellow]Public Webmail[/yellow]" if result["publicProvider"] else "[red]Unknown/Disposable[/red]"
-    intel_table.add_row("Type:", email_type)
+    type_color = "blue"
+    if result["type"] == "Disposable":
+        type_color = "red"
+    elif result["type"] == "Public Webmail":
+        type_color = "yellow"
+    intel_table.add_row("Type:", f"[{type_color}]{result['type']}[/{type_color}]")
     intel_table.add_row("Disposable:", "[red]Yes[/red]" if result["disposable"] else "[green]No[/green]")
     
     console.print(intel_table)
@@ -46,7 +50,10 @@ def main():
     
     dns_table.add_row("MX Record:", "[green]Found[/green]" if result["mx"] else "[red]Missing[/red]")
     dns_table.add_row("SPF Record:", "[green]Found[/green]" if result["spf"] else "[red]Missing[/red]")
-    dns_table.add_row("DKIM Record:", "[green]Found[/green]" if result["dkim"] else "[yellow]Not Found (Common selectors checked)[/yellow]")
+    
+    if result["dkim"]:
+        dns_table.add_row("DKIM Record:", "[green]Found[/green]")
+        
     dns_table.add_row("DMARC Record:", "[green]Found[/green]" if result["dmarc"] else "[yellow]Missing[/yellow]")
     
     console.print(dns_table)

@@ -22,14 +22,23 @@ program
       console.log(`${chalk.gray('Domain:')}         ${result.domain}`);
       console.log(`${chalk.gray('Valid:')}          ${result.valid ? chalk.green('Yes') : chalk.red('No')}`);
       console.log(`${chalk.gray('Provider:')}       ${result.provider} ${chalk.gray(`(Confidence: ${result.providerConfidence}%)`)}`);
-      console.log(`${chalk.gray('Type:')}           ${result.businessEmail ? chalk.blue('Business') : result.publicProvider ? chalk.yellow('Public Webmail') : chalk.red('Unknown/Disposable')}`);
+      
+      let typeColor = chalk.blue;
+      if (result.type === 'Public Webmail' || result.type === 'Disposable') {
+        typeColor = result.type === 'Disposable' ? chalk.red : chalk.yellow;
+      }
+      console.log(`${chalk.gray('Type:')}           ${typeColor(result.type)}`);
       console.log(`${chalk.gray('Disposable:')}     ${result.disposable ? chalk.red('Yes') : chalk.green('No')}`);
       
       console.log('');
       console.log(chalk.bold('--- DNS Records ---'));
       console.log(`${chalk.gray('MX Record:')}      ${result.mx ? chalk.green('Found') : chalk.red('Missing')}`);
       console.log(`${chalk.gray('SPF Record:')}     ${result.spf ? chalk.green('Found') : chalk.red('Missing')}`);
-      console.log(`${chalk.gray('DKIM Record:')}    ${result.dkim ? chalk.green('Found') : chalk.yellow('Not Found (Common selectors checked)')}`);
+      
+      if (result.dkim) {
+        console.log(`${chalk.gray('DKIM Record:')}    ${chalk.green('Found')}`);
+      }
+      
       console.log(`${chalk.gray('DMARC Record:')}   ${result.dmarc ? chalk.green('Found') : chalk.yellow('Missing')}`);
       
       console.log('');
