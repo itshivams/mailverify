@@ -1,17 +1,16 @@
-# email-intel
+# email-intel (JavaScript / TypeScript)
 
 Enterprise standard email intelligence and verification library for Node.js, Browsers, and CLI.
 
-Reliably detect email providers, verify MX and SPF/DMARC records, and identify disposable or temporary email addresses.
+This library is primarily focused on **checking if an email is valid**, **checking if it's a temp/disposable email**, and inferring the underlying email provider (e.g. Google Workspace, Microsoft 365, Zoho) with deep DNS analysis.
 
 ## Features
 
-- **Isomorphic**: Works in Node.js backend, Frontend browsers (using DoH), and CLI.
-- **DNS Verification**: MX, SPF, DMARC, and basic DKIM checks.
-- **Provider Inference**: Identifies Google Workspace, Microsoft 365, Zoho, etc.
-- **Disposable Detection**: Checks domains against an automatically updated daily list of disposable email services.
-- **Public vs Business**: Distinguishes between free public webmails (Gmail, Yahoo) and custom business domains.
-- **Confidence Scoring**: Computes a risk and confidence score for the email address.
+- **Email Validation**: Real-time MX record resolution to check if the domain can actually receive emails.
+- **Disposable Email Detection**: Checks domains against an automatically updated daily list of thousands of disposable/temp email services (like 10minutemail, GuerrillaMail).
+- **Provider Inference**: Identifies enterprise security gateways and providers like Proofpoint, Mimecast, Google Workspace, Microsoft 365, Zoho, etc.
+- **Domain Classification**: Intelligently classifies domains into `Education`, `Government`, `Organization`, `Public Webmail`, or `Business` based on TLDs and regex.
+- **Isomorphic**: Works flawlessly in the backend (Node.js) and the frontend (Browsers) out of the box.
 
 ## Installation
 
@@ -19,55 +18,118 @@ Reliably detect email providers, verify MX and SPF/DMARC records, and identify d
 npm install email-intel
 ```
 
-## Usage
+---
 
-### In Node.js / Browser (TypeScript/JavaScript)
+## Integration Guide
+
+### 1. Backend Integration (Node.js)
+
+In your Node.js backend (e.g., Express, NestJS), you can use `email-intel` to block signups from disposable emails or validate that an email's domain actually exists before saving it to your database.
 
 ```typescript
 import { analyze } from 'email-intel';
+import express from 'express';
 
-async function main() {
-  const result = await analyze("john@acme.com");
-  console.log(result);
-}
+const app = express();
+app.use(express.json());
 
-main();
+app.post('/register', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const report = await analyze(email);
+
+    // 1. Check if the email domain is valid (has MX records)
+    if (!report.valid) {
+      return res.status(400).json({ error: "Invalid email domain. Please provide a real email." });
+    }
+
+    // 2. Check if the email is a disposable/temp email
+    if (report.disposable) {
+      return res.status(400).json({ error: "Disposable emails are not allowed." });
+    }
+
+    // 3. Optional: Block free public webmails if you only want B2B users
+    if (report.type === "Public Webmail") {
+      return res.status(400).json({ error: "Please use your company email address." });
+    }
+
+    // Proceed with registration...
+    res.json({ message: "Registration successful!", data: report });
+
+  } catch (error) {
+    res.status(500).json({ error: "Email validation failed." });
+  }
+});
 ```
 
-**Example Output:**
-```json
-{
-  "email": "john@acme.com",
-  "domain": "acme.com",
-  "valid": true,
-  "provider": "Google Workspace",
-  "providerConfidence": 98,
-  "mx": true,
-  "spf": true,
-  "dkim": true,
-  "dmarc": true,
-  "disposable": false,
-  "publicProvider": false,
-  "businessEmail": true,
-  "catchAll": false,
-  "risk": "low",
-  "confidence": 95
+### 2. Frontend Integration (React / Next.js / Vue)
+
+You can also use `email-intel` directly in the browser! When run in the browser, it seamlessly falls back to Google's DNS-over-HTTPS (DoH) API to resolve DNS records without requiring a backend.
+
+This is perfect for providing instant feedback to users as they type.
+
+```tsx
+import React, { useState } from 'react';
+import { analyze, EmailIntelResult } from 'email-intel';
+
+export default function SignupForm() {
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleBlur = async () => {
+    if (!email.includes('@')) return;
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      const report: EmailIntelResult = await analyze(email);
+      
+      // Instantly warn the user if the domain is invalid
+      if (!report.valid) {
+        setError('This email domain does not appear to exist.');
+      } 
+      // Warn them if they are using a temporary email
+      else if (report.disposable) {
+        setError('Please use a real, permanent email address.');
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form>
+      <input 
+        type="email" 
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        onBlur={handleBlur} // Validate when user leaves the input field
+        placeholder="Enter your email"
+      />
+      {loading && <span>Verifying...</span>}
+      {error && <span style={{ color: 'red' }}>{error}</span>}
+      
+      <button disabled={!!error || loading}>Sign Up</button>
+    </form>
+  );
 }
 ```
 
-### CLI Usage
+---
+
+## CLI Usage
 
 You can also use the package globally as a CLI tool:
 
 ```bash
 npm install -g email-intel
 
-email-intel john@acme.com
+email-intel shivam@test.com
 ```
 
 This will output a nice, formatted intelligence report in your terminal!
-
-## How it Works
-
-- **DNS**: Uses native `dns` module in Node.js. If run in the browser, seamlessly falls back to Google's DNS-over-HTTPS (DoH).
-- **Lists**: `email-intel` leverages an open-source daily GitHub Action that maintains up-to-date lists of thousands of disposable and free email providers.

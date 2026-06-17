@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    branches: [ "release" ]
+
+jobs:
+  publish-npm:
+    name: Publish to NPM
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install and Build
+        working-directory: ./js
+        run: |
+          npm install
+          npm run build
+      - name: Publish to NPM
+        working-directory: ./js
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-pypi:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install build dependencies
+        run: python -m pip install --upgrade pip build
+      - name: Build package
+        working-directory: ./python
+        run: python -m build
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ./python/dist/
+          password: ${{ secrets.PYPI_API_TOKEN }}
+
+  publish-go:
+    name: Publish Go Tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create and Push Go Tag
+        run: |
+          VERSION="v1.0.$(date +%s)"
+          TAG="go/$VERSION"
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git tag -a $TAG -m "Release $TAG"
+          git push origin $TAG
