@@ -2,7 +2,7 @@ import re
 import dns.resolver
 import requests
 
-__version__ = "1.0.0"
+__version__ = "1.0.2"
 
 FALLBACK_DISPOSABLE = {
     "10minutemail.com", "dispostable.com", "guerrillamail.com", "mailinator.com",

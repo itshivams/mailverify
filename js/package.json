@@ -1,6 +1,6 @@
 {
   "name": "email-intel",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Enterprise standard email intelligence - MX, SPF, DMARC, disposable, and public provider checks.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

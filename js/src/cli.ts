@@ -9,7 +9,7 @@ const program = new Command();
 program
   .name('email-intel')
   .description('Enterprise standard email intelligence and verification.')
-  .version('1.0.1')
+  .version('1.0.2')
   .argument('<email>', 'Email address to analyze')
   .action(async (email: string) => {
     const spinner = ora(`Analyzing ${email}...`).start();
