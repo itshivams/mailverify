@@ -1,11 +1,11 @@
 <div align="center">
-  <img src="../.github/assets/banner.png" alt="Email-Intel Banner" width="100%" />
+  <img src="../.github/assets/banner.jpeg" alt="Email-Intel Banner" width="100%" />
 
   <br />
 
   <p><b>The Ultimate Enterprise-Standard Email Verification & Intelligence Library for Go</b></p>
 
-  [![Go Reference](https://pkg.go.dev/badge/github.com/itshivams/email-intel.svg)](https://pkg.go.dev/github.com/itshivams/email-intel)
+  [![Go Reference](https://pkg.go.dev/badge/github.com/itshivams/email-intel/go.svg)](https://pkg.go.dev/github.com/itshivams/email-intel/go)
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
   <p>🌐 <b>Website:</b> <a href="https://email-intel.itshivam.in">email-intel.itshivam.in</a></p>
@@ -44,7 +44,7 @@ When you analyze an email address (e.g., `test@itshivam.in`), the library return
 ## Installation
 
 ```bash
-go get github.com/itshivams/email-intel
+go get github.com/itshivams/email-intel/go
 ```
 
 ---
@@ -61,7 +61,7 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"github.com/itshivams/email-intel"
+	"github.com/itshivams/email-intel/go"
 	"github.com/gin-gonic/gin"
 )
 

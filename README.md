@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./.github/assets/banner.png" alt="Email-Intel Banner" width="100%" />
+  <img src="./.github/assets/banner.jpeg" alt="Email-Intel Banner" width="100%" />
 
   <br />
 
@@ -10,7 +10,7 @@
   [![npm downloads](https://img.shields.io/npm/dt/email-intel.svg?style=flat-square)](https://www.npmjs.com/package/email-intel)
   [![PyPI version](https://img.shields.io/pypi/v/email-intel-py.svg?style=flat-square)](https://pypi.org/project/email-intel-py/)
   [![PyPI downloads](https://img.shields.io/pypi/dm/email-intel-py.svg?style=flat-square)](https://pypi.org/project/email-intel-py/)
-  [![Go Reference](https://pkg.go.dev/badge/github.com/itshivams/email-intel.svg)](https://pkg.go.dev/github.com/itshivams/email-intel)
+  [![Go Reference](https://pkg.go.dev/badge/github.com/itshivams/email-intel/go.svg)](https://pkg.go.dev/github.com/itshivams/email-intel/go)
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
   <p>🌐 <b>Website:</b> <a href="https://email-intel.itshivam.in">email-intel.itshivam.in</a></p>

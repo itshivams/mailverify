@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/itshivams/email-intel"
+	"github.com/itshivams/email-intel/go"
 )
 
 func main() {
