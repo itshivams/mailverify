@@ -68,7 +68,7 @@ Extremely fast, concurrent execution using Go's native net resolver. Perfect for
 ### 🐍 Python
 Synchronous, robust DNS probing leveraging the powerful `dnspython` library. Great for Django/FastAPI.
 - **Navigate to package**: `cd python`
-- **Install**: `pip install email-intel`
+- **Install**: `pip install email-intel-py`
 - **Full Guide**: [Read the Python Documentation](./python/README.md)
 
 ---

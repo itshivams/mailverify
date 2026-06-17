@@ -45,7 +45,7 @@ When you analyze an email address (e.g., `test@itshivam.in`), the library return
 ## Installation
 
 ```bash
-pip install email-intel
+pip install email-intel-py
 ```
 
 ---
