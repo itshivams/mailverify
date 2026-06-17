@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Space Grotesk', sans-serif;
+
+  --color-neo-pink: #ff49db;
+  --color-neo-yellow: #ffde43;
+  --color-neo-cyan: #26e6e6;
+  --color-neo-green: #3cd070;
+  --color-neo-purple: #a855f7;
+  --color-neo-orange: #ff7a00;
+  --color-neo-blue: #3b82f6;
+  --color-neo-bg: #f4f3ef;
+
+  --shadow-neo: 4px 4px 0px 0px #000000;
+  --shadow-neo-lg: 8px 8px 0px 0px #000000;
+  --shadow-neo-xl: 12px 12px 0px 0px #000000;
+  --shadow-neo-sm: 2px 2px 0px 0px #000000;
+}
+
+body {
+  background-color: var(--color-neo-bg);
+  color: #000000;
+  font-family: var(--font-sans);
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f4f3ef;
+  border-left: 3px solid #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #ffe600;
+  border: 3px solid #000000;
+  border-radius: 0px;
+}
+
+.neo-border {
+  border: 4px solid #000000;
+}
+
+.neo-border-sm {
+  border: 2px solid #000000;
+}
+
+.neo-border-md {
+  border: 3px solid #000000;
+}
+
+.neo-btn-hover {
+  transition: all 0.15s ease-in-out;
+}
+
+.neo-btn-hover:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+
+.neo-btn-hover:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #000000;
+}
